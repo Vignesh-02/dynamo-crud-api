@@ -74,7 +74,7 @@ const createPost = async(event) =>  {
     }catch (err){
         console.log(err);
         response.statusCode = 500;
-        response.body = JSOn.stringify({
+        response.body = JSON.stringify({
             message: "Failed to create post",
             error: err.message,
             errorStack: err.stack
