@@ -58,8 +58,8 @@ functions:
           - 'dynamodb:DeleteItem'
         Resource: !GetAtt PostsTable.Arn
   updatePost:
-    handler: api.createPost
-    name: viguito-create-post
+    handler: api.updatePost
+    name: viguito-update-post
     events:
       - http:
           path: post/{postId}
