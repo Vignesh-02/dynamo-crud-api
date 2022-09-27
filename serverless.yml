@@ -1,0 +1,116 @@
+service: viguito-dynamo-crud-api
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: dev
+  region: us-east-1
+  apiName: ${self:service}
+  memorySize: 128 #mb
+  timeout: 10 #sec
+  environment: 
+   DYNAMODB_TABLE_NAME: ${self:custom.postsTableName} 
+
+custom:
+  postsTableName: posts-table-${self:provider.stage}-viguito
+
+# This plugin is the one you installed as a npm package.
+plugins:
+  - serverless-iam-roles-per-function
+
+# update isn't required as posting again to the same endpoint with the same name updates it 
+# event trigger is the api gateway trigger
+functions:
+  getPost:
+    handler: api.getPost
+    name: viguito-get-post
+    events:
+      - http:
+          path: post/{postId}
+          method: GET
+    iamRoleStatements:
+      - Effect: Allow
+        Action: 
+          - 'dynamodb:GetItem'
+        Resource: !GetAtt PostsTable.Arn
+  createPost:
+    handler: api.createPost
+    name: viguito-create-post
+    events:
+      - http:
+          path: post
+          method: POST  
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - 'dynamodb:PutItem'
+        Resource: !GetAtt PostsTable.Arn
+  deletePost:
+    handler: src/delete.handler
+    name: viguito-delete-post
+    events:
+      - http:
+          path: post/{postId}
+          method: DELETE
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - 'dynamodb:DeleteItem'
+        Resource: !GetAtt PostsTable.Arn
+  updatePost:
+    handler: api.createPost
+    name: viguito-create-post
+    events:
+      - http:
+          path: post/{postId}
+          method: PUT  
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - 'dynamodb:UpdateItem'
+        Resource: !GetAtt PostsTable.Arn
+  getAllPosts:
+    handler: api.getAllPosts
+    name: viguito-get-all-posts
+    events:
+      - http:
+          path: post/{postId}
+          method: GET  
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - 'dynamodb:Scan'
+        Resource: !GetAtt PostsTable.Arn
+
+# the /* is to match any nested directories
+# The * means that the lambda function has access to any nested folder of the s3 buckets
+# arn is amazon resource name
+#  lambda function cannot read or delete s3 bucket
+
+
+resources: 
+  Resources:
+    PostsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.postsTableName}
+        AttributeDefinitions:
+          - AttributeName: postId
+            AttributeType: S
+# S here refers to string
+        KeySchema:
+          - AttributeName: postId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+# key attribure is the primary key of the table
+
+
+
+
+# made changes to bucket name
+# installed plugin via command line
+# tried uninstalling and installing serverless-iam-roles-per-function
+#  removed plugin serverless-iam-roles-per-function and testing
