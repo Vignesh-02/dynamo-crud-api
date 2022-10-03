@@ -38,7 +38,7 @@ const getPost = async(event) =>  {
         console.log(err);
         response.statusCode = 500;
         response.body = JSON.stringify({
-            message: "Failed to get post",
+            message: "Failed to retreive post",
             error: err.message,
             errorStack: err.stack
         });
@@ -68,7 +68,7 @@ const createPost = async(event) =>  {
 
 
         response.body = JSON.stringify({
-           message: "successfully retrieved post",
+           message: "successfully created a post",
            createResult
         });
     }catch (err){
@@ -146,7 +146,7 @@ const deletePost = async(event) =>  {
 
 
         response.body = JSON.stringify({
-           message: "successfully updated the post",
+           message: "successfully deleted the post",
            deleteResult
         });
     }catch (err){
