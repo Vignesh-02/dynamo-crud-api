@@ -46,7 +46,7 @@ functions:
           - 'dynamodb:PutItem'
         Resource: !GetAtt PostsTable.Arn
   deletePost:
-    handler: src/delete.handler
+    handler: api.deletePost
     name: viguito-delete-post
     events:
       - http:
