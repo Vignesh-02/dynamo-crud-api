@@ -2,7 +2,7 @@ service: viguito-dynamo-crud-api
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs20.x
   stage: dev
   region: us-east-1
   apiName: ${self:service}
@@ -28,6 +28,7 @@ functions:
       - http:
           path: post/{postId}
           method: GET
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action: 
@@ -39,7 +40,8 @@ functions:
     events:
       - http:
           path: post
-          method: POST  
+          method: POST
+          cors: true  
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -52,6 +54,7 @@ functions:
       - http:
           path: post/{postId}
           method: DELETE
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -63,7 +66,8 @@ functions:
     events:
       - http:
           path: post/{postId}
-          method: PUT  
+          method: PUT
+          cors: true  
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -75,7 +79,8 @@ functions:
     events:
       - http:
           path: posts
-          method: GET  
+          method: GET
+          cors: true  
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -94,6 +99,7 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:custom.postsTableName}
+        BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: postId
             AttributeType: S
@@ -101,9 +107,10 @@ resources:
         KeySchema:
           - AttributeName: postId
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+
+        # ProvisionedThroughput:
+        #   ReadCapacityUnits: 1
+        #   WriteCapacityUnits: 1
 
 # key attribure is the primary key of the table
 
