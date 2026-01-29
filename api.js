@@ -1,4 +1,5 @@
  const db = require('./db');
+ easdfewsdf
  const {
     GetItemCommand,
     PutItemCommand,
@@ -187,7 +188,7 @@ const getAllPosts = async(event) =>  {
         console.log(err);
         response.statusCode = 500;
         response.body = JSON.stringify({
-            message: "Failed to delete post",
+            message: "Failed to get all posts",
             error: err.message,
             errorStack: err.stack
         });
