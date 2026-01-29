@@ -30,3 +30,12 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
+
+      - name: Notify Slack on Deployment Failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{
+            "text": "🚨 *DEPLOYMENT FAILED*\n\n*Service:* Dynamo CRUD API\n*Repo:* '${{ github.repository }}'\n*Branch:* '${{ github.ref_name }}'\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|View Commit>\n*Triggered by:* ${{ github.actor }}"
+          }' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
