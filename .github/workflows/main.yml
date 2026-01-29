@@ -10,6 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Start timer
+        id: timer
+        run: echo "start=$(date +%s)" >> $GITHUB_OUTPUT
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -35,8 +40,11 @@ jobs:
       - name: Notify Slack - Failure
         if: failure()
         run: |
-          END=$(date +%s)
-          DURATION=$((END - ${{ steps.timer.outputs.start }}))
+          START_TIME="${{ steps.timer.outputs.start }}"
+          END_TIME=$(date +%s)
+          DURATION=$((END_TIME - START_TIME))
+
+          echo "Deployment failed after ${DURATION}s"
 
           curl -X POST -H 'Content-type: application/json' \
           --data '{
@@ -69,9 +77,13 @@ jobs:
       - name: Notify Slack - Success
         if: success()
         run: |
-          END=$(date +%s)
-          DURATION=$((END - ${{ steps.timer.outputs.start }}))
+          
+          START_TIME="${{ steps.timer.outputs.start }}"
+          END_TIME=$(date +%s)
+          DURATION=$((END_TIME - START_TIME))
 
+          echo "Deployment succeeded in ${DURATION}s"
+          
           curl -X POST -H 'Content-type: application/json' \
           --data '{
             "blocks": [
