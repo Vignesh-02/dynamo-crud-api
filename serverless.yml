@@ -1,5 +1,5 @@
 service: viguito-dynamo-crud-api
-this is a test msg
+
 provider:
   name: aws
   runtime: nodejs20.x
