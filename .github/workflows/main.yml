@@ -31,11 +31,70 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
 
-      - name: Notify Slack on Deployment Failure
+      # FAILURE MESSAGE (Parent)
+      - name: Notify Slack - Failure
         if: failure()
         run: |
+          END=$(date +%s)
+          DURATION=$((END - ${{ steps.timer.outputs.start }}))
+
           curl -X POST -H 'Content-type: application/json' \
           --data '{
-            "text": "🚨 *DEPLOYMENT FAILED*\n\n*Service:* Dynamo CRUD API\n*Repo:* '${{ github.repository }}'\n*Branch:* '${{ github.ref_name }}'\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|View Commit>\n*Triggered by:* ${{ github.actor }}"
+            "blocks": [
+              {
+                "type": "header",
+                "text": { "type": "plain_text", "text": "🚨 Deployment Failed" }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  { "type": "mrkdwn", "text": "*Service:*\nDynamo CRUD API" },
+                  { "type": "mrkdwn", "text": "*Environment:*\nProduction" },
+                  { "type": "mrkdwn", "text": "*Branch:*\n'${{ github.ref_name }}'" },
+                  { "type": "mrkdwn", "text": "*Duration:*\n'"$DURATION"'s" }
+                ]
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|View Commit>\n*Triggered by:* ${{ github.actor }}"
+                }
+              }
+            ]
+          }' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # 🟢 SUCCESS MESSAGE
+      - name: Notify Slack - Success
+        if: success()
+        run: |
+          END=$(date +%s)
+          DURATION=$((END - ${{ steps.timer.outputs.start }}))
+
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{
+            "blocks": [
+              {
+                "type": "header",
+                "text": { "type": "plain_text", "text": "✅ Deployment Successful" }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  { "type": "mrkdwn", "text": "*Service:*\nDynamo CRUD API" },
+                  { "type": "mrkdwn", "text": "*Environment:*\nProduction" },
+                  { "type": "mrkdwn", "text": "*Branch:*\n'${{ github.ref_name }}'" },
+                  { "type": "mrkdwn", "text": "*Duration:*\n'"$DURATION"'s" }
+                ]
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|View Commit>\n*Deployed by:* ${{ github.actor }}"
+                }
+              }
+            ]
           }' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
