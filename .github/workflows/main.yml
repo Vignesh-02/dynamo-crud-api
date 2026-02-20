@@ -36,7 +36,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
 
-      # FAILURE MESSAGE (Parent)
+          
       - name: Notify Slack - Failure
         if: failure()
         run: |
@@ -73,7 +73,7 @@ jobs:
           }' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      # 🟢 SUCCESS MESSAGE
+
       - name: Notify Slack - Success
         if: success()
         run: |
